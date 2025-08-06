@@ -1,7 +1,8 @@
 Hi, I'm Raymond ✨ </br>
 💻 CYSE student a GMU </br>
-🛠 I create real world  web apps to better my life </br>
-
+🛠 I want to change the world with software </br>
+view my portfolio site @ raymondwquan.com 💻 </br>
+Phone 📱: 7032984818 
 
 ## 🌐 Socials:
 [![email](https://img.shields.io/badge/Email-D14836?logo=gmail&logoColor=white)](mailto:rquan3@gmu.edu) 
