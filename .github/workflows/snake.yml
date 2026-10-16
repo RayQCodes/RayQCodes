@@ -18,8 +18,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
+      - name: Check out profile
+        uses: actions/checkout@v4
+
       - name: Generate light and dark contribution snakes
-        uses: Platane/snk@a69d1dbca7a94c2ef0edf10dcd9e19982d74dd39 # v3.3.0
+        uses: Platane/snk@v3
         with:
           github_user_name: RayQCodes
           outputs: |
@@ -37,6 +40,9 @@ jobs:
           grep -q '<svg' dist/github-contribution-grid-snake.svg
           grep -q '<svg' dist/github-contribution-grid-snake-dark.svg
 
+      - name: Generate contribution activity calendar
+        run: python3 .github/scripts/contribution_graph.py
+
       - name: Publish to output branch
         uses: crazy-max/ghaction-github-pages@df5cc2bfa78282ded844b354faee141f06b41865 # v4
         with:
@@ -46,3 +52,18 @@ jobs:
           jekyll: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Refresh profile activity calendar
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p assets
+          cp dist/contribution-activity.svg assets/contribution-activity.svg
+          git add assets/contribution-activity.svg
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Refresh contribution activity calendar'
+          git push origin HEAD:main
