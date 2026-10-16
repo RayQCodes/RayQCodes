@@ -1,0 +1,48 @@
+name: Contribution snake
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 6 * * *'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: contribution-snake
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    name: Generate and publish SVGs
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Generate light and dark contribution snakes
+        uses: Platane/snk@a69d1dbca7a94c2ef0edf10dcd9e19982d74dd39 # v3.3.0
+        with:
+          github_user_name: RayQCodes
+          outputs: |
+            dist/github-contribution-grid-snake.svg?color_snake=#7c3aed
+            dist/github-contribution-grid-snake-dark.svg?palette=github-dark&color_snake=#a78bfa
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Verify generated SVGs
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s dist/github-contribution-grid-snake.svg
+          test -s dist/github-contribution-grid-snake-dark.svg
+          grep -q '<svg' dist/github-contribution-grid-snake.svg
+          grep -q '<svg' dist/github-contribution-grid-snake-dark.svg
+
+      - name: Publish to output branch
+        uses: crazy-max/ghaction-github-pages@df5cc2bfa78282ded844b354faee141f06b41865 # v4
+        with:
+          target_branch: output
+          build_dir: dist
+          keep_history: true
+          jekyll: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
